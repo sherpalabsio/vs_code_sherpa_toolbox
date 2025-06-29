@@ -1,13 +1,23 @@
 const vscode = require('vscode');
-const { generateCommitMessage } = require('./src/commit-message');
+const {
+  generateShortCommitMessage,
+  generateLongCommitMessage,
+} = require('./src/commit-message');
 
 /**
  * @param {vscode.ExtensionContext} context
  */
 function activate(context) {
-  const disposable = vscode.commands.registerTextEditorCommand(
-    'sherpa-toolbox.writeGitCommit',
-    generateCommitMessage
+  let disposable = vscode.commands.registerTextEditorCommand(
+    'sherpa-toolbox.generateShortCommitMessage',
+    generateShortCommitMessage
+  );
+
+  context.subscriptions.push(disposable);
+
+  disposable = vscode.commands.registerTextEditorCommand(
+    'sherpa-toolbox.generateLongCommitMessage',
+    generateLongCommitMessage
   );
 
   context.subscriptions.push(disposable);

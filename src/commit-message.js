@@ -1,10 +1,30 @@
 const vscode = require('vscode');
 
-const systemPrompt = `Writ me a short git commit message based on the following:`;
+const SHORT_SYSTEM_PROMPT = `Writ me a short git commit message based on the following:
+- Response in plain text
+- Don't use semantic commit message format
+- Use present tense`;
 
-async function generateCommitMessage(textEditor) {
-  console.log('Commit message 2');
+const LONG_SYSTEM_PROMPT = `Writ me a git commit message based on the following:
+- Response in plain text
+- Use very simple language
+- Use present tense
+- Don't use semantic commit message format
+- Start with a title no longer than 90 chars then add a description using the following format:
+  <title>
+  <blank line>
+  <description>
+- Break the description into paragraphs of no more than 80 chars per line`;
 
+async function generateShortCommitMessage(textEditor) {
+  generateCommitMessage(textEditor, SHORT_SYSTEM_PROMPT);
+}
+
+async function generateLongCommitMessage(textEditor) {
+  generateCommitMessage(textEditor, LONG_SYSTEM_PROMPT);
+}
+
+async function generateCommitMessage(textEditor, systemPrompt) {
   const [model] = await vscode.lm.selectChatModels({
     vendor: 'copilot',
     family: 'gpt-4o',
@@ -67,5 +87,6 @@ async function clearEditorContent(textEditor) {
 }
 
 module.exports = {
-  generateCommitMessage,
+  generateShortCommitMessage,
+  generateLongCommitMessage,
 };

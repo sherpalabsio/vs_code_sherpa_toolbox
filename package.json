@@ -12,10 +12,16 @@
   "activationEvents": [],
   "main": "./extension.js",
   "contributes": {
-    "commands": [{
-      "command": "sherpa-toolbox.writeGitCommit",
-      "title": "gc - Write from instructions"
-    }]
+    "commands": [
+      {
+        "command": "sherpa-toolbox.generateShortCommitMessage",
+        "title": "gc: Short"
+      },
+      {
+        "command": "sherpa-toolbox.generateLongCommitMessage",
+        "title": "gc: Long"
+      }
+    ]
   },
   "scripts": {
     "lint": "eslint .",
