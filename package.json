@@ -13,8 +13,8 @@
   "main": "./extension.js",
   "contributes": {
     "commands": [{
-      "command": "sherpa-toolbox.helloWorld",
-      "title": "Hello World"
+      "command": "sherpa-toolbox.writeGitCommit",
+      "title": "gc - Write from instructions"
     }]
   },
   "scripts": {
