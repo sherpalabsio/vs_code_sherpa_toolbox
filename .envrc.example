@@ -1,0 +1,2 @@
+alias depl="make install_locally"
+alias rollb="make uninstall_locally"
