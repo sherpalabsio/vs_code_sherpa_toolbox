@@ -1,4 +1,5 @@
 const vscode = require('vscode');
+const { execSync } = require('child_process');
 
 const SHORT_SYSTEM_PROMPT = `Writ me a maximum 80 char long git commit message based on the following:
 - Response in plain text
@@ -10,11 +11,12 @@ const LONG_SYSTEM_PROMPT = `Writ me a git commit message based on the following:
 - Use very simple language
 - Use present tense
 - Don't use semantic commit message format
-- Start with a title no longer than 90 chars then add a description using the following format:
-  <title>
-  <blank line>
-  <description>
-- Break the description into paragraphs of no more than 80 chars per line`;
+- Start with a title no longer than 90 chars
+- Add a short description to summarize the changes on a functional/product level using bullet points only
+  - Use min 0, max 3 bullet points
+  - If a bullet point is longer than 80 chars, split it into multiple lines
+  - Ignore the minor tech details, focus on the functional changes
+  - Merge similar bullet points into one`;
 
 async function generateShortCommitMessage(textEditor) {
   generateCommitMessage(textEditor, SHORT_SYSTEM_PROMPT);
@@ -37,14 +39,16 @@ async function generateCommitMessage(textEditor, systemPrompt) {
     return;
   }
 
-  let chatResponse;
-
-  const instructions = textEditor.document.getText();
+  const instructions = getInstructions(textEditor);
 
   const prompt = [
     vscode.LanguageModelChatMessage.User(systemPrompt),
     vscode.LanguageModelChatMessage.User(instructions),
   ];
+
+  console.log('Prompt instructions:', instructions);
+
+  let chatResponse;
 
   try {
     chatResponse = await model.sendRequest(
@@ -80,6 +84,36 @@ async function generateCommitMessage(textEditor, systemPrompt) {
       edit.insert(position, err.message);
     });
   }
+}
+
+function getInstructions(textEditor) {
+  let result = textEditor.document.getText().trim();
+
+  if (result === '') {
+    result = '[diff]';
+  } else if (!result.includes('[diff]')) {
+    return result;
+  }
+
+  let gitDiff = '';
+
+  try {
+    gitDiff = execSync('git diff --cached', {
+      cwd: vscode.workspace.workspaceFolders?.[0]?.uri.fsPath || process.cwd(),
+      encoding: 'utf8',
+      maxBuffer: 10 * 1024 * 1024, // 10MB buffer
+    }).trim();
+  } catch (err) {
+    vscode.window.showErrorMessage('Failed to get Git diff for staged files.');
+    console.error(err);
+    return;
+  }
+
+  if (gitDiff !== '') {
+    gitDiff = `\n\nGit diff:\n\`\`\`${gitDiff}\n\`\`\``;
+  }
+
+  return result.replace('[diff]', gitDiff);
 }
 
 async function clearEditorContent(textEditor) {
