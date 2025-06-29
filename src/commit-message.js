@@ -34,32 +34,22 @@ async function generateCommitMessage(textEditor) {
     return;
   }
 
-  await clearEditorContent(textEditor);
-
   try {
-    // Stream the code into the editor as it is coming in from the Language Model
+    let fullResponse = '';
     for await (const fragment of chatResponse.text) {
-      await textEditor.edit((edit) => {
-        const lastLine = textEditor.document.lineAt(
-          textEditor.document.lineCount - 1
-        );
-        const position = new vscode.Position(
-          lastLine.lineNumber,
-          lastLine.text.length
-        );
-        edit.insert(position, fragment);
-      });
+      fullResponse += fragment;
     }
+
+    await clearEditorContent(textEditor);
+
+    await textEditor.edit((edit) => {
+      const position = new vscode.Position(0, 0);
+      edit.insert(position, fullResponse);
+    });
   } catch (err) {
     // async response stream may fail, e.g network interruption or server side error
     await textEditor.edit((edit) => {
-      const lastLine = textEditor.document.lineAt(
-        textEditor.document.lineCount - 1
-      );
-      const position = new vscode.Position(
-        lastLine.lineNumber,
-        lastLine.text.length
-      );
+      const position = new vscode.Position(0, 0);
       edit.insert(position, err.message);
     });
   }
