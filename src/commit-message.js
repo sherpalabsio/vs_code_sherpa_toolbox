@@ -1,6 +1,6 @@
 const vscode = require('vscode');
 
-const SHORT_SYSTEM_PROMPT = `Writ me a short git commit message based on the following:
+const SHORT_SYSTEM_PROMPT = `Writ me a maximum 80 char long git commit message based on the following:
 - Response in plain text
 - Don't use semantic commit message format
 - Use present tense`;
