@@ -30,6 +30,13 @@ async function generateCommitMessage(textEditor, systemPrompt) {
     family: 'gpt-4o',
   });
 
+  if (!model) {
+    vscode.window.showErrorMessage(
+      'No suitable chat model available. Make sure GitHub Copilot is enabled.'
+    );
+    return;
+  }
+
   let chatResponse;
 
   const instructions = textEditor.document.getText();
