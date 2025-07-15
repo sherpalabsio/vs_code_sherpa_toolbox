@@ -71,18 +71,10 @@ async function generateCommitMessage(textEditor, systemPrompt) {
       fullResponse += fragment;
     }
 
-    await clearEditorContent(textEditor);
-
-    await textEditor.edit((edit) => {
-      const position = new vscode.Position(0, 0);
-      edit.insert(position, fullResponse);
-    });
+    replaceEditorContent(textEditor, fullResponse);
   } catch (err) {
     // async response stream may fail, e.g network interruption or server side error
-    await textEditor.edit((edit) => {
-      const position = new vscode.Position(0, 0);
-      edit.insert(position, err.message);
-    });
+    replaceEditorContent(textEditor, err.message);
   }
 }
 
@@ -116,14 +108,14 @@ function getInstructions(textEditor) {
   return result.replace('[diff]', gitDiff);
 }
 
-async function clearEditorContent(textEditor) {
+async function replaceEditorContent(textEditor, newContent) {
   await textEditor.edit((edit) => {
     const start = new vscode.Position(0, 0);
     const end = new vscode.Position(
       textEditor.document.lineCount - 1,
       textEditor.document.lineAt(textEditor.document.lineCount - 1).text.length
     );
-    edit.delete(new vscode.Range(start, end));
+    edit.replace(new vscode.Range(start, end), newContent);
   });
 }
 
