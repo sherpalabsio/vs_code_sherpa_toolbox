@@ -1,10 +1,12 @@
 const vscode = require('vscode');
 const { execSync } = require('child_process');
 
-const SHORT_SYSTEM_PROMPT = `Writ me a maximum 80 char long git commit message based on the following:
-- Response in plain text
+const SHORT_SYSTEM_PROMPT = `Writ me a maximum 110 char long git commit message based on the following:
+- Respond in plain text
 - Don't use semantic commit message format
-- Use present tense`;
+- Use present tense
+- DO NOT include implementation details
+- Don't include how something was changed`;
 
 const LONG_SYSTEM_PROMPT = `Writ me a git commit message based on the following:
 - Response in plain text
